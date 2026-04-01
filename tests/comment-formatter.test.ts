@@ -88,4 +88,16 @@ describe('formatComment', () => {
     const comment = formatComment([nestViolation]);
     expect(comment).toContain('NestJS');
   });
+
+  it('escapes pipe characters in file names to not break table', () => {
+    const v: RouteViolation = { ...baseViolation, file: 'src/pipe|name.ts' };
+    const comment = formatComment([v]);
+    expect(comment).toContain('\\|');
+  });
+
+  it('uses double-backtick delimiters when path contains a backtick', () => {
+    const v: RouteViolation = { ...baseViolation, path: '/path`with`tick' };
+    const comment = formatComment([v]);
+    expect(comment).toContain('`` ');
+  });
 });

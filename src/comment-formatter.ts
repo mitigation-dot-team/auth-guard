@@ -4,6 +4,21 @@ import type { RouteViolation } from './types';
 export const COMMENT_MARKER = '<!-- auth-guard-comment -->';
 
 /**
+ * Escape characters that would break a Markdown table cell or inline code span.
+ * - Pipe `|` is the column separator and must be escaped as `\|`.
+ * - Backticks inside an inline code span are handled by using a double-backtick
+ *   delimiter when the value itself contains a backtick.
+ */
+function tableCell(value: string): string {
+  const escaped = value.replace(/\|/g, '\\|');
+  // Use double-backtick delimiters when the value contains a backtick
+  if (escaped.includes('`')) {
+    return `\`\` ${escaped} \`\``;
+  }
+  return `\`${escaped}\``;
+}
+
+/**
  * Build the Markdown body for a GitHub PR comment that lists all
  * route violations found in the diff.
  */
@@ -31,7 +46,7 @@ export function formatComment(violations: RouteViolation[]): string {
   for (const v of violations) {
     const sensitive = v.isSensitive ? '⚠️ Yes' : 'No';
     lines.push(
-      `| \`${v.file}\` | ${v.line} | \`${v.method}\` | \`${v.path}\` | ${sensitive} |`,
+      `| ${tableCell(v.file)} | ${v.line} | ${tableCell(v.method)} | ${tableCell(v.path)} | ${sensitive} |`,
     );
   }
 

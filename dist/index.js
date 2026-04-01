@@ -35039,6 +35039,20 @@ exports.formatComment = formatComment;
 /** HTML comment marker used to identify existing auth-guard PR comments. */
 exports.COMMENT_MARKER = '<!-- auth-guard-comment -->';
 /**
+ * Escape characters that would break a Markdown table cell or inline code span.
+ * - Pipe `|` is the column separator and must be escaped as `\|`.
+ * - Backticks inside an inline code span are handled by using a double-backtick
+ *   delimiter when the value itself contains a backtick.
+ */
+function tableCell(value) {
+    const escaped = value.replace(/\|/g, '\\|');
+    // Use double-backtick delimiters when the value contains a backtick
+    if (escaped.includes('`')) {
+        return `\`\` ${escaped} \`\``;
+    }
+    return `\`${escaped}\``;
+}
+/**
  * Build the Markdown body for a GitHub PR comment that lists all
  * route violations found in the diff.
  */
@@ -35060,7 +35074,7 @@ function formatComment(violations) {
     lines.push('|------|------|--------|-------|-----------|');
     for (const v of violations) {
         const sensitive = v.isSensitive ? '⚠️ Yes' : 'No';
-        lines.push(`| \`${v.file}\` | ${v.line} | \`${v.method}\` | \`${v.path}\` | ${sensitive} |`);
+        lines.push(`| ${tableCell(v.file)} | ${v.line} | ${tableCell(v.method)} | ${tableCell(v.path)} | ${sensitive} |`);
     }
     lines.push('');
     lines.push('### Recommendation');
