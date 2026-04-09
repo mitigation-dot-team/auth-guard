@@ -1,14 +1,14 @@
 name: 'Auth Guard'
-description: 'Analyzes PR diffs to detect new API endpoints missing authentication middleware'
+description: 'Analyzes PR diffs to detect new API endpoints missing authentication middleware.'
 author: 'mitigation-dot-team'
 
 inputs:
   github-token:
-    description: 'GitHub token with permissions to read PR diffs and post comments'
+    description: 'GitHub token with permissions to read PR diffs and post comments.'
     required: true
     default: ${{ github.token }}
   fail-on-violation:
-    description: 'Fail the action if authentication violations are found'
+    description: 'Fail the action if authentication violations are found.'
     required: false
     default: 'false'
 
@@ -17,7 +17,7 @@ outputs:
     description: 'JSON array of detected route violations'
 
 runs:
-  using: 'node20'
+  using: 'node24'
   main: 'dist/index.js'
 
 branding:
